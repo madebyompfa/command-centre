@@ -24,7 +24,7 @@ function showOverview() {
     // Greeting based on the time of day
     const hour = now.getHours();
     let greeting = "Good evening";
-    if (hour >= 5 && hour < 12) {
+    if (hour < 12) {
         greeting = "Good morning";
     } else if (hour >= 12 && hour < 18) {
         greeting = "Good afternoon";
