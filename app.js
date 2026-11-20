@@ -198,7 +198,9 @@ function showDeadlines() {
     });
 }
 
-//----- HABITS -----
+// ----- HABITS -----
+let editingHabit = null; // which habit is being edited (null = none)
+
 function showHabits() {
     const todayKey = dateKey(new Date());
     const days = thisWeek();
@@ -218,12 +220,13 @@ function showHabits() {
         });
 
         listHTML += `
-            <li class="item habit">
+            <li class="item habit ${index === editingHabit ? "editing" : ""}">
                 <div class="item-text">
                     <strong>${escapeHTML(h.name)}</strong>
                     <span>${streak(h)} day streak</span>
                 </div>
                 <div class="days">${dayButtons}</div>
+                <button class="edit" data-index="${index}">Edit</button>
                 <button class="delete" data-index="${index}">Delete</button>
             </li>`;
     });
@@ -232,25 +235,53 @@ function showHabits() {
         listHTML = `<li class="empty">No habits yet.</li>`;
     }
 
+    const e = editingHabit !== null ? habits[editingHabit] : null;
+
     main.innerHTML = `
         <h2>Habits</h2>
         <form id="habit-form" class="add-form">
-            <input id="habit-name" placeholder="New habit (e.g. Read 20 pages)" required>
-            <button type="submit">Add</button>
+            <input id="habit-name" placeholder="New habit (e.g. Read 20 pages)" value="${e ? escapeHTML(e.name) : ""}" required>
+            <button type="submit">${e ? "Save" : "Add"}</button>
+            ${e ? `<button type="button" id="cancel-edit" class="cancel">Cancel</button>` : ""}
         </form>
         <ul class="list">${listHTML}</ul>
     `;
 
+    // ADD or SAVE
     document.getElementById("habit-form").addEventListener("submit", function (event) {
         event.preventDefault();
-        habits.push({
-            name: document.getElementById("habit-name").value,
-            log: {}
-        });
+        const name = document.getElementById("habit-name").value;
+
+        if (editingHabit !== null) {
+            habits[editingHabit].name = name; // keeps its ticks and streak
+            editingHabit = null;
+        } else {
+            habits.push({ name: name, log: {} });
+        }
+
         saveHabits();
         showHabits();
     });
 
+    // CANCEL editing
+    const cancelBtn = document.getElementById("cancel-edit");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+            editingHabit = null;
+            showHabits();
+        });
+    }
+
+    // EDIT
+    document.querySelectorAll(".edit").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            editingHabit = Number(btn.dataset.index);
+            showHabits();
+            document.getElementById("habit-name").focus();
+        });
+    });
+
+    // TICK a day
     document.querySelectorAll(".day").forEach(function (btn) {
         btn.addEventListener("click", function () {
             const h = habits[btn.dataset.index];
@@ -265,9 +296,11 @@ function showHabits() {
         });
     });
 
+    // DELETE
     document.querySelectorAll(".delete").forEach(function (btn) {
         btn.addEventListener("click", function () {
             habits.splice(btn.dataset.index, 1);
+            editingHabit = null;
             saveHabits();
             showHabits();
         });
