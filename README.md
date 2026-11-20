@@ -30,7 +30,11 @@ Each section follows the same pattern:
 3. The array is saved to `localStorage`
 4. The section re-draws itself from the array
 
-Each larger section has its own file (`university.js`, `goals.js`, `fitness-reading.js`, `overview.js`), and `app.js` handles navigation.
+Each larger section has its own file (`university.js`, `goals.js`, `fitness-reading.js`, `overview.js`), and `app.js` handles navigation and shared helpers.
+
+## Security
+
+All text you type is escaped with an `escapeHTML` function before it's shown on the page. Input like `<img src=x onerror=alert(1)>` displays as plain text instead of running as code, which prevents cross-site scripting (XSS).
 
 ## Run it locally
 
@@ -39,7 +43,6 @@ Each larger section has its own file (`university.js`, `goals.js`, `fitness-read
 
 ## Planned improvements
 
-- Escape user input to prevent HTML injection (XSS)
 - Edit existing items, not just add and delete
 - Export and import a backup of your data
 - Sync between devices
