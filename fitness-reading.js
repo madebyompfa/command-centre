@@ -18,13 +18,11 @@ function showFitness() {
     const thisMonth = todayKey.slice(0, 7);
     const letters = ["M", "T", "W", "T", "F", "S", "S"];
 
-    // This week's dates as "2026-11-19" strings
     const weekKeys = [];
     thisWeek().forEach(function (d) {
         weekKeys.push(dateKey(d));
     });
 
-    // Count workouts this week and this month
     let weekCount = 0;
     let monthCount = 0;
     workouts.forEach(function (w) {
@@ -32,7 +30,6 @@ function showFitness() {
         if (w.date.slice(0, 7) === thisMonth) monthCount++;
     });
 
-    // Week strip: one box per day, showing the session or "Rest"
     let stripHTML = "";
     weekKeys.forEach(function (key, i) {
         const w = workouts.find(function (x) {
@@ -41,11 +38,10 @@ function showFitness() {
         stripHTML += `
             <div class="wd ${w ? "on" : ""} ${key === todayKey ? "today" : ""}">
                 <small>${letters[i]}</small>
-                <span>${w ? w.type : "Rest"}</span>
+                <span>${w ? escapeHTML(w.type) : "Rest"}</span>
             </div>`;
     });
 
-    // Recent workouts, newest first (shows the last 10)
     workouts.sort(function (a, b) {
         return b.date.localeCompare(a.date);
     });
@@ -56,8 +52,8 @@ function showFitness() {
         recentHTML += `
             <li class="item">
                 <div class="item-text">
-                    <strong>${w.type}</strong>
-                    <span>${w.date}</span>
+                    <strong>${escapeHTML(w.type)}</strong>
+                    <span>${escapeHTML(w.date)}</span>
                 </div>
                 <button class="delete delete-workout" data-i="${index}">Delete</button>
             </li>`;
@@ -66,7 +62,6 @@ function showFitness() {
         recentHTML = `<li class="empty">No workouts logged yet.</li>`;
     }
 
-    // Lifts: latest, best and progress since the first entry
     let liftsHTML = "";
     lifts.forEach(function (l, li) {
         let info = "No entries yet";
@@ -85,7 +80,7 @@ function showFitness() {
         liftsHTML += `
             <li class="item lift">
                 <div class="item-text">
-                    <strong>${l.name}</strong>
+                    <strong>${escapeHTML(l.name)}</strong>
                     <span>${info}</span>
                 </div>
                 <form class="add-form small lift-form" data-i="${li}">
@@ -126,7 +121,6 @@ function showFitness() {
         <ul class="list">${liftsHTML}</ul>
     `;
 
-    // LOG a workout
     document.getElementById("workout-form").addEventListener("submit", function (event) {
         event.preventDefault();
         workouts.push({
@@ -137,7 +131,6 @@ function showFitness() {
         showFitness();
     });
 
-    // DELETE a workout
     document.querySelectorAll(".delete-workout").forEach(function (btn) {
         btn.addEventListener("click", function () {
             workouts.splice(btn.dataset.i, 1);
@@ -146,7 +139,6 @@ function showFitness() {
         });
     });
 
-    // ADD a lift
     document.getElementById("lift-form").addEventListener("submit", function (event) {
         event.preventDefault();
         lifts.push({
@@ -157,7 +149,6 @@ function showFitness() {
         showFitness();
     });
 
-    // LOG a weight for a lift
     document.querySelectorAll(".lift-form").forEach(function (form) {
         form.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -170,7 +161,6 @@ function showFitness() {
         });
     });
 
-    // DELETE a lift
     document.querySelectorAll(".delete-lift").forEach(function (btn) {
         btn.addEventListener("click", function () {
             lifts.splice(btn.dataset.i, 1);
@@ -214,8 +204,8 @@ function showReading() {
                 <div class="card">
                     <div class="card-head">
                         <div>
-                            <h3>${b.title}</h3>
-                            <span class="muted">${b.author}</span>
+                            <h3>${escapeHTML(b.title)}</h3>
+                            <span class="muted">${escapeHTML(b.author)}</span>
                         </div>
                         <button class="delete delete-book" data-i="${bi}">Delete</button>
                     </div>
@@ -241,7 +231,6 @@ function showReading() {
         <div class="columns">${columnsHTML}</div>
     `;
 
-    // ADD a book (goes into "Up next")
     document.getElementById("book-form").addEventListener("submit", function (event) {
         event.preventDefault();
         books.push({
@@ -255,7 +244,6 @@ function showReading() {
         showReading();
     });
 
-    // START reading a book
     document.querySelectorAll(".start-book").forEach(function (btn) {
         btn.addEventListener("click", function () {
             books[btn.dataset.i].status = "reading";
@@ -264,7 +252,6 @@ function showReading() {
         });
     });
 
-    // +10 PAGES (moves to Finished at the last page)
     document.querySelectorAll(".add-pages").forEach(function (btn) {
         btn.addEventListener("click", function () {
             const b = books[btn.dataset.i];
@@ -277,7 +264,6 @@ function showReading() {
         });
     });
 
-    // DELETE a book
     document.querySelectorAll(".delete-book").forEach(function (btn) {
         btn.addEventListener("click", function () {
             books.splice(btn.dataset.i, 1);

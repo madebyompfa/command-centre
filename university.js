@@ -50,17 +50,15 @@ function showUniversity() {
     modules.forEach(function (m, mi) {
         const s = moduleStats(m);
 
-        // Colour the average: green = on target, red = below 50
         let colour = "";
         if (s.average !== null && s.average >= m.target) colour = "green";
         if (s.average !== null && s.average < 50) colour = "red";
 
-        // One row per assessment
         let rows = "";
         m.assessments.forEach(function (a, ai) {
             rows += `
                 <li>
-                    <span>${a.name}</span>
+                    <span>${escapeHTML(a.name)}</span>
                     <span class="muted">${a.weight}%</span>
                     <input class="mark-input" type="number" min="0" max="100" step="0.1"
                            placeholder="Mark" value="${a.mark === null ? "" : a.mark}"
@@ -73,8 +71,8 @@ function showUniversity() {
             <div class="card">
                 <div class="card-head">
                     <div>
-                        <span class="code">${m.code}</span>
-                        <h3>${m.name}</h3>
+                        <span class="code">${escapeHTML(m.code)}</span>
+                        <h3>${escapeHTML(m.name)}</h3>
                     </div>
                     <button class="delete delete-module" data-m="${mi}">Delete</button>
                 </div>
@@ -117,7 +115,6 @@ function showUniversity() {
         <div class="cards">${cardsHTML}</div>
     `;
 
-    // ADD a module
     document.getElementById("module-form").addEventListener("submit", function (event) {
         event.preventDefault();
         modules.push({
@@ -130,7 +127,6 @@ function showUniversity() {
         showUniversity();
     });
 
-    // ADD an assessment to a module
     document.querySelectorAll(".assess-form").forEach(function (form) {
         form.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -144,7 +140,6 @@ function showUniversity() {
         });
     });
 
-    // ENTER a mark (saves when you click away or press Enter)
     document.querySelectorAll(".mark-input").forEach(function (input) {
         input.addEventListener("change", function () {
             const a = modules[input.dataset.m].assessments[input.dataset.a];
@@ -154,7 +149,6 @@ function showUniversity() {
         });
     });
 
-    // DELETE an assessment
     document.querySelectorAll(".delete-assess").forEach(function (btn) {
         btn.addEventListener("click", function () {
             modules[btn.dataset.m].assessments.splice(btn.dataset.a, 1);
@@ -163,7 +157,6 @@ function showUniversity() {
         });
     });
 
-    // DELETE a module
     document.querySelectorAll(".delete-module").forEach(function (btn) {
         btn.addEventListener("click", function () {
             modules.splice(btn.dataset.m, 1);

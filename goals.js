@@ -10,8 +10,6 @@ function saveProjects() {
     localStorage.setItem("projects", JSON.stringify(projects));
 }
 
-// ----- SHARED HELPERS (used by both goals and projects) -----
-
 // Percentage of checklist items ticked
 function progress(items) {
     if (items.length === 0) return 0;
@@ -35,7 +33,7 @@ function checklistHTML(items, ownerIndex, placeholder) {
             <li class="${it.done ? "done" : ""}">
                 <label>
                     <input type="checkbox" class="step-check" data-o="${ownerIndex}" data-s="${i}" ${it.done ? "checked" : ""}>
-                    <span>${it.text}</span>
+                    <span>${escapeHTML(it.text)}</span>
                 </label>
                 <button class="x step-del" data-o="${ownerIndex}" data-s="${i}">×</button>
             </li>`;
@@ -48,9 +46,7 @@ function checklistHTML(items, ownerIndex, placeholder) {
     return html;
 }
 
-// Makes the checklist buttons work.
-// list = goals or projects, key = "steps" or "tasks",
-// save and redraw = the functions to call after a change
+// Makes the checklist buttons work
 function wireChecklists(list, key, save, redraw) {
     document.querySelectorAll(".step-check").forEach(function (box) {
         box.addEventListener("change", function () {
@@ -92,8 +88,8 @@ function showGoals() {
             <div class="card">
                 <div class="card-head">
                     <div>
-                        <h3>${g.title}</h3>
-                        <span class="muted">${g.due ? "By " + g.due + " · " : ""}${p}% done</span>
+                        <h3>${escapeHTML(g.title)}</h3>
+                        <span class="muted">${g.due ? "By " + escapeHTML(g.due) + " · " : ""}${p}% done</span>
                     </div>
                     <button class="delete delete-goal" data-i="${gi}">Delete</button>
                 </div>
@@ -153,12 +149,11 @@ function showProjects() {
 
         projects.forEach(function (pr, pi) {
             if (pr.status !== stage[0]) {
-                return; // this project belongs in a different column
+                return;
             }
 
             const p = progress(pr.tasks);
 
-            // dropdown to move the project between columns
             let options = "";
             stages.forEach(function (s) {
                 options += `<option value="${s[0]}" ${s[0] === pr.status ? "selected" : ""}>${s[1]}</option>`;
@@ -168,7 +163,7 @@ function showProjects() {
                 <div class="card">
                     <div class="card-head">
                         <div>
-                            <h3>${pr.name}</h3>
+                            <h3>${escapeHTML(pr.name)}</h3>
                             <span class="muted">${p}% done</span>
                         </div>
                         <button class="delete delete-project" data-i="${pi}">Delete</button>

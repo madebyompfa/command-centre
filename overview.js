@@ -21,7 +21,6 @@ function showOverview() {
     const now = new Date();
     const todayKey = dateKey(now);
 
-    // Greeting based on the time of day
     const hour = now.getHours();
     let greeting = "Good evening";
     if (hour < 12) {
@@ -67,8 +66,8 @@ function showOverview() {
         nextHTML += `
             <li class="item">
                 <div class="item-text">
-                    <strong>${d.title}</strong>
-                    <span>${d.module ? d.module + " · " : ""}${d.due}</span>
+                    <strong>${escapeHTML(d.title)}</strong>
+                    <span>${d.module ? escapeHTML(d.module) + " · " : ""}${escapeHTML(d.due)}</span>
                 </div>
                 <span class="pill ${colour}">${label}</span>
             </li>`;
@@ -86,7 +85,7 @@ function showOverview() {
         habitsHTML += `
             <button class="habit-chip ${done ? "on" : ""}" data-i="${i}">
                 <span class="box">${done ? "✓" : ""}</span>
-                <span class="hname">${h.name}</span>
+                <span class="hname">${escapeHTML(h.name)}</span>
                 <em>${streak(h)} day streak</em>
             </button>`;
     });
@@ -121,7 +120,7 @@ function showOverview() {
         const s = moduleStats(m);
         modulesHTML += `
             <li class="mod-row">
-                <span class="code">${m.code}</span>
+                <span class="code">${escapeHTML(m.code)}</span>
                 ${barHTML(s.average === null ? 0 : s.average)}
                 <span class="mod-avg">${s.average === null ? "--" : Math.round(s.average) + "%"}</span>
             </li>`;
@@ -136,7 +135,7 @@ function showOverview() {
         const p = progress(g.steps);
         goalsHTML += `
             <div class="goal-row">
-                <div class="row-top"><span>${g.title}</span><span class="muted">${p}%</span></div>
+                <div class="row-top"><span>${escapeHTML(g.title)}</span><span class="muted">${p}%</span></div>
                 ${barHTML(p)}
             </div>`;
     });
@@ -144,7 +143,6 @@ function showOverview() {
         goalsHTML = `<p class="empty">No goals yet.</p>`;
     }
 
-    // ----- Put it all on the page -----
     main.innerHTML = `
         <p class="muted">${dateText}</p>
         <h2 class="greeting">${greeting}, ${MY_NAME}</h2>
@@ -195,14 +193,12 @@ function showOverview() {
         </div>
     `;
 
-    // Tiles and "All ..." links jump to that section
     document.querySelectorAll("[data-go]").forEach(function (btn) {
         btn.addEventListener("click", function () {
             goTo(btn.dataset.go);
         });
     });
 
-    // Tick a habit for today straight from the overview
     document.querySelectorAll(".habit-chip").forEach(function (btn) {
         btn.addEventListener("click", function () {
             const h = habits[btn.dataset.i];

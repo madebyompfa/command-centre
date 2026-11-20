@@ -182,7 +182,7 @@ function showHabits() {
         listHTML += `
             <li class="item habit">
                 <div class="item-text">
-                    <strong>${h.name}</strong>
+                    <strong>${escapeHTML(h.name)}</strong>
                     <span>${streak(h)} day streak</span>
                 </div>
                 <div class="days">${dayButtons}</div>
@@ -266,7 +266,7 @@ function showBudget() {
         listHTML += `
             <li class="item">
                 <div class="item-text">
-                    <strong>${t.desc}</strong>
+                    <strong>${escapeHTML(t.desc)}</strong>
                     <span>${t.date}</span>
                 </div>
                 <span class="amount ${t.type === "in" ? "green" : ""}">
