@@ -97,6 +97,8 @@ function showSection(name) {
 }
 
 // ----- DEADLINES -----
+let editingDeadline = null; // which deadline is being edited (null = none)
+
 function showDeadlines() {
     deadlines.sort(function (a, b) {
         return a.due.localeCompare(b.due);
@@ -105,12 +107,13 @@ function showDeadlines() {
     let listHTML = "";
     deadlines.forEach(function (d, index) {
         listHTML += `
-            <li class="item ${d.done ? "done" : ""}">
+            <li class="item ${d.done ? "done" : ""} ${index === editingDeadline ? "editing" : ""}">
                 <input type="checkbox" class="tick" data-index="${index}" ${d.done ? "checked" : ""}>
                 <div class="item-text">
                     <strong>${escapeHTML(d.title)}</strong>
                     <span>${d.module ? escapeHTML(d.module) + " · " : ""}due ${escapeHTML(d.due)}</span>
                 </div>
+                <button class="edit" data-index="${index}">Edit</button>
                 <button class="delete" data-index="${index}">Delete</button>
             </li>`;
     });
@@ -119,29 +122,62 @@ function showDeadlines() {
         listHTML = `<li class="empty">No deadlines yet.</li>`;
     }
 
+    // If we're editing, grab that deadline so we can fill the form with it
+    const e = editingDeadline !== null ? deadlines[editingDeadline] : null;
+
     main.innerHTML = `
         <h2>Deadlines</h2>
         <form id="deadline-form" class="add-form">
-            <input id="title" placeholder="What's due?" required>
-            <input id="module" placeholder="Module (e.g. WEDE5020)">
-            <input id="due" type="date" required>
-            <button type="submit">Add</button>
+            <input id="title" placeholder="What's due?" value="${e ? escapeHTML(e.title) : ""}" required>
+            <input id="module" placeholder="Module (e.g. WEDE5020)" value="${e ? escapeHTML(e.module) : ""}">
+            <input id="due" type="date" value="${e ? escapeHTML(e.due) : ""}" required>
+            <button type="submit">${e ? "Save" : "Add"}</button>
+            ${e ? `<button type="button" id="cancel-edit" class="cancel">Cancel</button>` : ""}
         </form>
         <ul class="list">${listHTML}</ul>
     `;
 
+    // ADD or SAVE
     document.getElementById("deadline-form").addEventListener("submit", function (event) {
         event.preventDefault();
-        deadlines.push({
-            title: document.getElementById("title").value,
-            module: document.getElementById("module").value,
-            due: document.getElementById("due").value,
-            done: false
-        });
+        const title = document.getElementById("title").value;
+        const module = document.getElementById("module").value;
+        const due = document.getElementById("due").value;
+
+        if (editingDeadline !== null) {
+            // update the existing one (keeps its ticked/unticked state)
+            const d = deadlines[editingDeadline];
+            d.title = title;
+            d.module = module;
+            d.due = due;
+            editingDeadline = null;
+        } else {
+            deadlines.push({ title: title, module: module, due: due, done: false });
+        }
+
         saveDeadlines();
         showDeadlines();
     });
 
+    // CANCEL editing
+    const cancelBtn = document.getElementById("cancel-edit");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+            editingDeadline = null;
+            showDeadlines();
+        });
+    }
+
+    // EDIT: load a deadline into the form
+    document.querySelectorAll(".edit").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            editingDeadline = Number(btn.dataset.index);
+            showDeadlines();
+            document.getElementById("title").focus();
+        });
+    });
+
+    // TICK
     document.querySelectorAll(".tick").forEach(function (box) {
         box.addEventListener("change", function () {
             const d = deadlines[box.dataset.index];
@@ -151,16 +187,18 @@ function showDeadlines() {
         });
     });
 
+    // DELETE
     document.querySelectorAll(".delete").forEach(function (btn) {
         btn.addEventListener("click", function () {
             deadlines.splice(btn.dataset.index, 1);
+            editingDeadline = null;
             saveDeadlines();
             showDeadlines();
         });
     });
 }
 
-// ----- HABITS -----
+//----- HABITS -----
 function showHabits() {
     const todayKey = dateKey(new Date());
     const days = thisWeek();

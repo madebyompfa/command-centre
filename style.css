@@ -67,10 +67,12 @@ main {
     .app {
         grid-template-columns: 1fr;
     }
+
     nav {
         flex-direction: row;
         overflow-x: auto;
     }
+
     .nav-link {
         white-space: nowrap;
     }
@@ -763,6 +765,7 @@ main {
     .tiles {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .overview-grid {
         grid-template-columns: 1fr;
     }
@@ -773,4 +776,35 @@ main {
         height: auto;
         z-index: 5;
     }
+}
+
+/* ===== EDIT ===== */
+.edit,
+.cancel {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.edit:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.add-form .cancel {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+}
+
+.item.editing {
+    outline: 1px solid var(--accent);
+    outline-offset: -1px;
+    border-radius: 12px;
 }
