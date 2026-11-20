@@ -16,6 +16,15 @@ function saveTransactions() {
 }
 
 // ===== HELPERS =====
+// Makes user text safe to put inside HTML
+function escapeHTML(text) {
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 // Turns a date into "2026-11-19"
 function dateKey(date) {
     const y = date.getFullYear();
@@ -99,8 +108,8 @@ function showDeadlines() {
             <li class="item ${d.done ? "done" : ""}">
                 <input type="checkbox" class="tick" data-index="${index}" ${d.done ? "checked" : ""}>
                 <div class="item-text">
-                    <strong>${d.title}</strong>
-                    <span>${d.module ? d.module + " · " : ""}due ${d.due}</span>
+                    <strong>${escapeHTML(d.title)}</strong>
+                    <span>${d.module ? escapeHTML(d.module) + " · " : ""}due ${escapeHTML(d.due)}</span>
                 </div>
                 <button class="delete" data-index="${index}">Delete</button>
             </li>`;
